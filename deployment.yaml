@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-exporter
+  labels:
+    app: cloudflare-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflare-exporter
+  template:
+    metadata:
+      labels:
+        app: cloudflare-exporter
+    spec:
+      shareProcessNamespace: true
+      containers:
+        - name: cloudflare-exporter
+          image: ghcr.io/lablabs/cloudflare_exporter:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+          - secretRef:
+              name: secrets-cloudflare-credentials
+          env:
+            - name: "SCRAPE_DELAY"
+              value: "60"
